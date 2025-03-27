@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import TaskList from './pages/TaskList';
 
 const App: React.FC = () => {
+  // Check if the user is authenticated
   const isAuthenticated = !!localStorage.getItem('token');
 
   return (

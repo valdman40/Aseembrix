@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction, RequestHandler } from 'express';
+import express, { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { authMiddleware, AuthenticatedRequest } from '../middleware/authMiddleware';
 import { encryptData, decryptData } from '../utils/encryption';
@@ -7,6 +7,9 @@ import sanitizeHtml from 'sanitize-html';
 
 const router = express.Router();
 
+/**
+ * Task interface
+ */
 interface Task {
   id: string;
   title: string;
@@ -16,12 +19,14 @@ interface Task {
 // In-memory store for tasks (keyed by user ID)
 const tasksStore: { [userId: string]: Task[] } = {};
 
-// Apply authentication middleware
-router.use(authMiddleware);
-
-// 📌 **Get Tasks (Fixed TS Error)**
-const getTasks: RequestHandler = (req: AuthenticatedRequest, res: Response): void => {
-    console.log('Getting tasks');
+/**
+ * Get tasks function
+ * Retrieves all tasks for the authenticated user
+ * @param req - Authenticated request
+ * @param res - Response containing the user's tasks
+ */
+const getTasks = (req: AuthenticatedRequest, res: Response): void => {
+  console.log('Getting tasks');
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -30,6 +35,7 @@ const getTasks: RequestHandler = (req: AuthenticatedRequest, res: Response): voi
     }
 
     const userTasks = tasksStore[userId] || [];
+    // the description is encrypted, so we need to decrypt it before sending it to the client
     res.json({
       tasks: userTasks.map((task) => ({
         ...task,
@@ -42,11 +48,14 @@ const getTasks: RequestHandler = (req: AuthenticatedRequest, res: Response): voi
   }
 };
 
-router.get('/', getTasks);
-
-// 📌 **Create a New Task (Fixed TS Error)**
-const createTask: RequestHandler = (req: AuthenticatedRequest, res: Response): void => {
-    console.log('Creating task:', req.body);
+/**
+ * Create task function
+ * Creates a new task for the authenticated user
+ * @param req - Authenticated request containing task details
+ * @param res - Response containing the created task
+ */
+const createTask = (req: AuthenticatedRequest, res: Response): void => {
+  console.log('Creating task:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -84,23 +93,25 @@ const createTask: RequestHandler = (req: AuthenticatedRequest, res: Response): v
   }
 };
 
-router.post(
-  '/',
-  [
-    body('title')
-      .trim()
-      .isLength({ min: 3, max: 100 }).withMessage('Title must be between 3 and 100 characters.')
-      .escape(),
-    body('description')
-      .trim()
-      .isLength({ min: 5 }).withMessage('Description must be at least 5 characters long.')
-      .customSanitizer((value) => sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} })),
-  ],
-  createTask
-);
+const createTaskValidator = [
+  body('title')
+    .trim()
+    .isLength({ min: 3, max: 100 }).withMessage('Title must be between 3 and 100 characters.')
+    .escape(),
+  body('description')
+    .trim()
+    .isLength({ min: 5 }).withMessage('Description must be at least 5 characters long.')
+    .customSanitizer((value) => sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} })),
+];
 
-// 📌 **Delete a Task (Fixed TS Error)**
-const deleteTask: RequestHandler = (req: AuthenticatedRequest, res: Response): void => {
+/**
+ * Delete task function
+ * Deletes a task for the authenticated user
+ * @param req - Authenticated request containing the task ID
+ * @param res - Response confirming task deletion
+ */
+const deleteTask = (req: AuthenticatedRequest, res: Response): void => {
+  console.log('Deleting task:', req.params.id);
   try {
     const userId = req.user?.id;
     const taskId = req.params.id;
@@ -110,8 +121,6 @@ const deleteTask: RequestHandler = (req: AuthenticatedRequest, res: Response): v
       return;
     }
 
-    console.log('Deleting task:', taskId);
-
     tasksStore[userId] = tasksStore[userId].filter((task) => task.id !== taskId);
     res.json({ message: 'Task deleted successfully' });
   } catch (error) {
@@ -120,6 +129,9 @@ const deleteTask: RequestHandler = (req: AuthenticatedRequest, res: Response): v
   }
 };
 
+// Routes
+router.get('/', getTasks);
+router.post( '/', createTaskValidator, createTask );
 router.delete('/:id', deleteTask);
 
 export default router;

@@ -23,7 +23,8 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello from Assembrix backend!');
 });
 
-// Define SSL certificate options
+// Define SSL certificate options (in order to use HTTPS)
+// The certificates are stored in the certs folder
 const certsPath = path.join(__dirname, 'certs');
 const options = {
   key: fs.readFileSync(path.join(certsPath, 'server.key')),
