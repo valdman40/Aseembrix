@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    // Target modern JavaScript features (ES6 and beyond)
+    "target": "ES6",
+    // Use the latest module system for bundlers like Webpack
+    "module": "ESNext",
+    // Include DOM library for browser APIs, plus ESNext for new JavaScript features
+    "lib": ["DOM", "ESNext"],
+    // Use Node's module resolution strategy
+    "moduleResolution": "node",
+    // Strict mode settings
+    "strict": true,
+    // Allows default imports from modules with no default export
+    "allowSyntheticDefaultImports": true,
+    // Provides interoperability between CommonJS and ES Modules
+    "esModuleInterop": true,
+    // Skip type checking of .d.ts files in node_modules (faster builds)
+    "skipLibCheck": true,
+    // Ensures consistent casing in imports
+    "forceConsistentCasingInFileNames": true,
+    // Compile JSX code as React. If you have TS 4.1+ and React 17+, you can use "react-jsx"
+    "jsx": "react"
+  },
+  // Specify the root folder where TypeScript looks for files
+  "include": ["src/**/*"],
+  // Folders to exclude from compilation
+  "exclude": ["node_modules", "dist"]
+}
