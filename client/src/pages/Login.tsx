@@ -2,42 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import styled from 'styled-components';
-
-const Container = styled.div`
-  max-width: 400px;
-  margin: 100px auto;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-`;
+import Input from '../components/StyledInput';
+import Card from '../components/StyledCard';
+import Button from '../components/StyledButton';
+import { getText, setLanguage, Language } from '../i18n/lang';
 
 const Title = styled.h2`
   color: #4CAF50;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.8rem;
-  margin: 0.5rem 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const Button = styled.button`
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #4CAF50;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 1rem;
-
-  &:hover {
-    background-color: #45a049;
-  }
 `;
 
 const ErrorText = styled.p`
@@ -54,11 +25,24 @@ const LinkButton = styled(Button)`
   }
 `;
 
+const LanguageToggle = styled.select`
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+`;
+
 const Login: React.FC = () => {
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin');
   const [error, setError] = useState('');
+  const [language, setLang] = useState('en');
   const navigate = useNavigate();
+
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedLanguage = e.target.value;
+    setLang(selectedLanguage);
+    setLanguage(selectedLanguage as Language); // Update the language globally
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,34 +53,38 @@ const Login: React.FC = () => {
       // force a page reload to update the authenticated state
       window.location.href = '/tasks';
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || getText('LOGIN_FAILED'));
     }
   };
 
   return (
-    <Container>
-      <Title>Login</Title>
+    <Card>
+      <Title>{getText('LOGIN')}</Title>
       {error && <ErrorText>{error}</ErrorText>}
       <form onSubmit={handleLogin}>
         <Input
-          placeholder="Username"
+          placeholder={getText('USERNAME')}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
         />
         <Input
           type="password"
-          placeholder="Password"
+          placeholder={getText('PASSWORD')}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <Button type="submit">Login</Button>
+        <Button type="submit">{getText('LOGIN')}</Button>
       </form>
 
-      <p>Don't have an account?</p>
-      <LinkButton onClick={() => navigate('/register')}>Register</LinkButton>
-    </Container>
+      <p>{getText('DONT_HAVE_ACCOUNT')}</p>
+      <LinkButton onClick={() => navigate('/register')}>{getText('REGISTER')}</LinkButton>
+      <LanguageToggle value={language} onChange={handleLanguageChange}>
+        <option value="en">en</option>
+        <option value="he">עבר</option>
+      </LanguageToggle>
+    </Card>
   );
 };
 

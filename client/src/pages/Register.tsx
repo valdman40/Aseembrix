@@ -2,39 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import styled from 'styled-components';
-
-const Container = styled.div`
-  max-width: 400px;
-  margin: 100px auto;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-`;
+import Input from '../components/StyledInput';
+import Card from '../components/StyledCard';
+import StyledButton from '../components/StyledButton';
+import { getText } from '../i18n/lang';
 
 const Title = styled.h2`
   color: #2196F3;
 `;
 
-const Input = styled.input`
-  width: 100%;
-  padding: 0.8rem;
-  margin: 0.5rem 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const Button = styled.button`
-  width: 100%;
-  padding: 0.8rem;
+const Button = styled(StyledButton)`
   background-color: #2196F3;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 1rem;
-
   &:hover {
     background-color: #1e88e5;
   }
@@ -44,7 +22,7 @@ const ErrorText = styled.p`
   color: red;
 `;
 
-const LinkButton = styled(Button)`
+const LinkButton = styled(StyledButton)`
   background-color: transparent;
   color: #2196F3;
   border: 1px solid #2196F3;
@@ -66,33 +44,33 @@ const Register: React.FC = () => {
       await api.post('/auth/register', { username, password });
       navigate('/login');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || getText('REGISTER_FAILED'));
     }
   };
 
   return (
-    <Container>
-      <Title>Register</Title>
+    <Card>
+      <Title>{getText('REGISTER')}</Title>
       {error && <ErrorText>{error}</ErrorText>}
       <form onSubmit={handleRegister}>
         <Input
-          placeholder="Username"
+          placeholder={getText('USERNAME')}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
         />
         <Input
           type="password"
-          placeholder="Password"
+          placeholder={getText('PASSWORD')}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <Button type="submit">Register</Button>
+        <Button type="submit">{getText('REGISTER')}</Button>
       </form>
 
-      <LinkButton onClick={() => navigate('/login')}>Back to Login</LinkButton>
-    </Container>
+      <LinkButton onClick={() => navigate('/login')}>{getText('BACK_TO_LOGIN')}</LinkButton>
+    </Card>
   );
 };
 

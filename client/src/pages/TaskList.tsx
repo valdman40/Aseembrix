@@ -1,44 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import styled from 'styled-components';
+import Input from '../components/StyledInput';
+import Button from '../components/StyledButton';
+import StyledCard from '../components/StyledCard';
+import { Task } from '../types/tasks';
+import { getText } from '../i18n/lang';
 
 // Styled Components
-const Container = styled.div`
+const TasksCard = styled(StyledCard)`
   max-width: 600px;
   margin: 50px auto;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
   background-color: #f9f9f9;
 `;
 
 const Title = styled.h2`
   color: #4CAF50;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.8rem;
-  margin: 0.5rem 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const Button = styled.button`
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 1rem;
-
-  &:hover {
-    background-color: #45a049;
-  }
 `;
 
 const LogoutButton = styled(Button)`
@@ -64,24 +41,14 @@ const TaskContainer = styled.li`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
-const DeleteButton = styled.button`
+const DeleteButton = styled(Button)`
   background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-
+  width: 100px;
+  margin-top: 0;
   &:hover {
     background-color: #d32f2f;
   }
 `;
-
-interface Task {
-  id: string;
-  title: string;
-  description: string
-}
 
 const TaskRender: React.FC<{ task: Task; handleDeleteTask: (id: string) => void }> = ({ task, handleDeleteTask }) => {
   const { id, title, description } = task;
@@ -90,7 +57,7 @@ const TaskRender: React.FC<{ task: Task; handleDeleteTask: (id: string) => void 
       <strong>{title}</strong>
       <p>{description}</p>
     </div>
-    <DeleteButton onClick={() => handleDeleteTask(id)}>Delete</DeleteButton>
+    <DeleteButton onClick={() => handleDeleteTask(id)}>{getText('DELETE')}</DeleteButton>
   </TaskContainer>
 }
 
@@ -106,7 +73,7 @@ const TaskList: React.FC = () => {
       const response = await api.get('/tasks');
       setTasks(response.data.tasks);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch tasks');
+      setError(err.response?.data?.message || getText('TASKS_FETCH_FAILED'));
     }
   };
 
@@ -123,7 +90,7 @@ const TaskList: React.FC = () => {
       setTitle('');
       setDescription('');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create task');
+      setError(err.response?.data?.message || getText('TASK_CREATED_FAILED'));
     }
   };
 
@@ -133,7 +100,7 @@ const TaskList: React.FC = () => {
       await api.delete(`/tasks/${taskId}`);
       setTasks(tasks.filter((task) => task.id !== taskId)); // Remove task from state
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to delete task');
+      setError(err.response?.data?.message || getText('TASK_DELETE_FAILED'));
     }
   };
 
@@ -144,22 +111,22 @@ const TaskList: React.FC = () => {
   };
 
   return (
-    <Container>
-      <Title>Task List</Title>
+    <TasksCard>
+      <Title>{getText('TASK_LIST')}</Title>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <form onSubmit={handleCreateTask}>
-        <Input type="text" placeholder="Task Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        <Input type="text" placeholder="Task Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
-        <Button type="submit">Add Task</Button>
+        <Input type="text" placeholder={getText('TASK_TITLE')} value={title} onChange={(e) => setTitle(e.target.value)} required />
+        <Input type="text" placeholder={getText('TASK_DESCRIPTION')} value={description} onChange={(e) => setDescription(e.target.value)} required />
+        <Button type="submit">{getText('ADD_TASK')}</Button>
       </form>
 
       <TaskListContainer>
         {tasks.map((task) => <TaskRender key={task.id} task={task} handleDeleteTask={handleDeleteTask} />)}
       </TaskListContainer>
 
-      <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-    </Container>
+      <LogoutButton onClick={handleLogout}>{getText('LOGOUT')}</LogoutButton>
+    </TasksCard>
   );
 };
 
