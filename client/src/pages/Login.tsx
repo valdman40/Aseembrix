@@ -32,8 +32,8 @@ const LanguageToggle = styled.select`
 `;
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [language, setLang] = useState('en');
   const navigate = useNavigate();

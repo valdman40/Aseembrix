@@ -5,8 +5,10 @@ interface CustomAxiosRequest extends AxiosRequestConfig {
   _retry?: boolean;
 }
 
+const baseURL = process.env.REACT_APP_API_URL || 'https://localhost:3001/api';
+
 const api = axios.create({
-    baseURL: 'https://10.0.0.9:3001/api',
+    baseURL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -64,7 +66,7 @@ api.interceptors.response.use(
         if (!refreshToken) throw new Error('No refresh token');
 
         const response = await axios.post(
-          'https://10.0.0.9:3001/api/auth/refresh',
+          `${baseURL}/auth/refresh-token`,
           { refreshToken }
         );
 
