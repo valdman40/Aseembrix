@@ -61,6 +61,8 @@ const TaskRender: React.FC<{ task: Task; handleDeleteTask: (id: string) => void 
   </TaskContainer>
 }
 
+const token = localStorage.getItem('token');
+
 const TaskList: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState('');
@@ -78,8 +80,10 @@ const TaskList: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if(token){
+      fetchTasks();
+    }
+  }, [token]);
 
   // Create a new task
   const handleCreateTask = async (e: React.FormEvent) => {

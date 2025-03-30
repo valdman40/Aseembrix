@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { authMiddleware, AuthenticatedRequest } from '../middleware/authMiddleware';
 import { encryptData, decryptData } from '../utils/encryption';
@@ -6,6 +6,7 @@ import { body, validationResult } from 'express-validator';
 import sanitizeHtml from 'sanitize-html';
 
 const router = express.Router();
+router.use(authMiddleware);
 
 /**
  * Task interface
@@ -26,10 +27,10 @@ const tasksStore: { [userId: string]: Task[] } = {};
  * @param res - Response containing the user's tasks
  */
 const getTasks = (req: AuthenticatedRequest, res: Response): void => {
-  console.log('Getting tasks');
   try {
     const userId = req.user?.id;
     if (!userId) {
+      console.error('Unauthorized access attempt');
       res.status(403).json({ message: 'Unauthorized' });
       return;
     }

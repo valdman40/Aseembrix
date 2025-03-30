@@ -12,7 +12,7 @@ const api = axios.create({
     },
 });
 
-// 🔐 Add token to requests
+// Add token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token && config.headers) {
@@ -21,7 +21,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 🔁 Auto refresh on 401
+// Auto refresh on 401
 let isRefreshing = false;
 let failedQueue: {
   resolve: (token: string) => void;
